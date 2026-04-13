@@ -1,4 +1,9 @@
 # ========================================
+# Bun Stage: Extract bun binary
+# ========================================
+FROM oven/bun:1-alpine AS bun-binary
+
+# ========================================
 # Base Stage: Alpine Linux with Node
 # ========================================
 FROM node:22-alpine AS base
@@ -53,22 +58,19 @@ RUN cd apps/mail && pnpm run build
 FROM base AS runner
 WORKDIR /app
 
-# Install bun (required by entrypoint.sh to run server.js)
-RUN apk add --no-cache curl unzip && \
-    curl -fsSL https://bun.sh/install | sh && \
-    ln -s /root/.bun/bin/bun /usr/local/bin/bun
+# Copy bun binary directly from official bun image (avoids install script issues)
+COPY --from=bun-binary /usr/local/bin/bun /usr/local/bin/bun
 
 RUN npm install -g wrangler
 
 RUN addgroup -S -g 1001 pnpm && \
     adduser -S -u 1001 nextjs -G pnpm
 
-# Set environment variables for build
+# Set environment variables
 ENV NODE_ENV=production \
     PORT=3000 \
     HOSTNAME="0.0.0.0" \
-    NEXT_TELEMETRY_DISABLED=1 \
-    PATH="/root/.bun/bin:$PATH"
+    NEXT_TELEMETRY_DISABLED=1
 
 # Copy entrypoint and run it
 COPY scripts/docker/ /app/scripts
