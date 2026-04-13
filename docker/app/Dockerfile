@@ -1,5 +1,5 @@
 # ========================================
-# Base Stage: Alpine Linux with Bun
+# Base Stage: Alpine Linux with Node
 # ========================================
 FROM node:22-alpine AS base
 
@@ -53,6 +53,11 @@ RUN cd apps/mail && pnpm run build
 FROM base AS runner
 WORKDIR /app
 
+# Install bun (required by entrypoint.sh to run server.js)
+RUN apk add --no-cache curl unzip && \
+    curl -fsSL https://bun.sh/install | sh && \
+    ln -s /root/.bun/bin/bun /usr/local/bin/bun
+
 RUN npm install -g wrangler
 
 RUN addgroup -S -g 1001 pnpm && \
@@ -62,7 +67,8 @@ RUN addgroup -S -g 1001 pnpm && \
 ENV NODE_ENV=production \
     PORT=3000 \
     HOSTNAME="0.0.0.0" \
-    NEXT_TELEMETRY_DISABLED=1
+    NEXT_TELEMETRY_DISABLED=1 \
+    PATH="/root/.bun/bin:$PATH"
 
 # Copy entrypoint and run it
 COPY scripts/docker/ /app/scripts
