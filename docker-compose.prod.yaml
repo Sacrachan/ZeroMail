@@ -3,15 +3,18 @@ services:
     build:
       context: .
       dockerfile: docker/app/Dockerfile
+      args:
+        VITE_PUBLIC_BACKEND_URL: ${VITE_PUBLIC_BACKEND_URL:-http://localhost:3001}
+        VITE_PUBLIC_APP_URL: ${VITE_PUBLIC_APP_URL:-http://localhost:3001}
     environment:
-      VITE_PUBLIC_BACKEND_URL: ${VITE_PUBLIC_BACKEND_URL:-https://localhost:3001}
-      VITE_PUBLIC_APP_URL: ${VITE_PUBLIC_APP_URL:-https://localhost:3001}
       DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-zerodotemail}
       REDIS_URL: ${REDIS_URL:-http://upstash-proxy:80}
       REDIS_TOKEN: ${REDIS_TOKEN:-upstash-local-token}
       BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
       BETTER_AUTH_URL: ${BETTER_AUTH_URL:-http://localhost:3001}
       COOKIE_DOMAIN: ${COOKIE_DOMAIN:-localhost}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
       RESEND_API_KEY: ${RESEND_API_KEY}
       AI_SYSTEM_PROMPT: ${AI_SYSTEM_PROMPT}
       GROQ_API_KEY: ${GROQ_API_KEY}
