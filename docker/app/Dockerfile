@@ -44,6 +44,12 @@ ENV CI=true
 # Install all dependencies (including devDependencies for build)
 RUN pnpm install --frozen-lockfile
 
+# Build-time args for Vite env vars (embedded into frontend bundle at build time)
+ARG VITE_PUBLIC_BACKEND_URL
+ARG VITE_PUBLIC_APP_URL
+ENV VITE_PUBLIC_BACKEND_URL=$VITE_PUBLIC_BACKEND_URL
+ENV VITE_PUBLIC_APP_URL=$VITE_PUBLIC_APP_URL
+
 # Set environment variables for build
 ENV NEXT_TELEMETRY_DISABLED=1 \
     NODE_ENV=production \
